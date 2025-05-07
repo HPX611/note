@@ -1,0 +1,94 @@
+prim算法:
+
+#include<cstring>
+#include<iostream>
+
+using namespace std;
+const int N=510,INF=0x3f3f3f3f;
+int d[N][N];
+int dist[N];
+bool st[N];
+int n,m,res;
+
+bool prim(){
+    memset(dist,0x3f,sizeof dist);
+    dist[1]=0;
+    
+    for(int i=1;i<=n;i++){
+        int t=-1;
+        for(int j=1;j<=n;j++)
+            if(!st[j] && (t==-1 || dist[t]>dist[j])) t=j;
+            
+        if(dist[t]==INF) return 0;
+        st[t]=1;
+        res+=dist[t];
+        for(int j=1;j<=n;j++) dist[j]=min(dist[j],d[j][t]);
+    }
+    return 1;
+}
+
+int main(void){
+    scanf("%d%d",&n,&m);
+    memset(d,0x3f,sizeof d);
+    
+    int a,b,c;
+    while(m--){
+        scanf("%d%d%d",&a,&b,&c);
+        d[a][b]=d[b][a]=min(d[a][b],c);//邻接矩阵建图
+    }
+    
+    if(prim()) cout<<res;
+    else cout<<"impossible";
+    
+    return 0;
+}
+
+kruskal算法：
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+
+using namespace std;
+
+const int N=200010;
+struct Edge{
+    int a,b,w;
+    bool operator<(const Edge& W)const
+    {
+        return w<W.w;
+    }
+}e[N];
+int n,m;
+int p[N];
+
+int find(int x){
+    if(p[x]!=x) p[x]=find(p[x]);
+    return p[x];
+}
+
+int main(void){
+    scanf("%d%d",&n,&m);
+    
+    for(int i=1;i<=n;i++) p[i]=i;
+    
+    for(int i=0;i<m;i++)
+        scanf("%d%d%d",&e[i].a,&e[i].b,&e[i].w);
+    
+    sort(e,e+m);
+    
+    int res=0,cnt=0;
+    
+    for(int i=0;i<m;i++){
+        int a=find(e[i].a),b=find(e[i].b),w=e[i].w;
+        if(a!=b){
+            p[a]=b;
+            res+=w;
+            cnt++;
+        }
+    }
+    
+    if(cnt!=n-1) cout<<"impossible";
+    else cout<<res;
+    
+    return 0;
+}

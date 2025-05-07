@@ -1,0 +1,123 @@
+第二题：
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=110;
+int n,x;
+bool st[N];
+
+int main(void){
+    scanf("%d",&n);
+    
+    int res[N];
+    while(n--){
+        scanf("%d",&x);
+        
+        int cnt=0;
+        for(int i=1;i<=100;i++){
+            int flag=1;
+            if(i+x-1>((i-1)/5+1)*5) flag=0;
+            for(int j=i;j<i+x;j++)
+                if(st[j]) flag=0;
+            
+            if(flag){
+                cnt=0;
+                for(int j=i;j<i+x;j++)
+                    res[cnt++]=j;
+                break;
+            }
+            
+            if(!st[i] && cnt<x)  
+                res[cnt++]=i;
+        }
+        
+        for(int i=0;i<cnt;i++){
+            printf("%d ",res[i]);
+            st[res[i]]=1;
+        }
+        printf("\n");
+    }
+    
+    return 0;
+}
+
+第三题：
+#include<iostream>
+#include<cstring>
+#include<string>
+
+using namespace std;
+const int N=10;
+struct Node{
+    int X,Y;
+}tr[2][N];
+int n;
+
+int main(void){
+    cin>>n;
+    string s;
+    int a,b,c;
+    int player=0;
+    tr[0][0].X=tr[1][0].X=30;
+    
+    while(n--){
+        cin>>s;
+        if(s=="summon"){
+            cin>>a>>b>>c;
+            for(int i=7;i>=a;i--)
+                if(tr[player][i].X<=0) continue;
+                else tr[player][i+1]=tr[player][i];
+            tr[player][a]={c,b};
+        }
+        else if(s=="attack"){
+            cin>>a>>b;
+            tr[player][a].X-=tr[player^1][b].Y;
+            tr[player^1][b].X-=tr[player][a].Y;
+            
+            for(int i=1;i<=7;i++)
+                if(tr[0][i].X>0) continue;
+                else{
+                    tr[0][i]=tr[0][i+1];
+                    tr[0][i+1].X=0;
+                }
+            
+            for(int i=1;i<=7;i++)
+                if(tr[1][i].X>0) continue;
+                else{
+                    tr[1][i]=tr[1][i+1];
+                    tr[1][i+1].X=0;
+                }
+        }
+        else player^=1;
+    }
+    
+    if(tr[0][0].X>0 && tr[1][0].X>0) printf("0\n");
+    else if(tr[0][0].X>0) printf("1\n");
+    else printf("-1\n");
+    
+    printf("%d\n",tr[0][0].X);
+    
+    for(int i=1;i<=8;i++)
+        if(tr[0][i].X<=0){
+            printf("%d ",i-1);
+            break;
+        }
+    
+    for(int i=1;i<=7;i++)
+        if(tr[0][i].X>0) printf("%d ",tr[0][i].X);
+        else break;
+    
+    printf("\n%d\n",tr[1][0].X);
+    
+    for(int i=1;i<=8;i++)
+        if(tr[1][i].X<=0){
+            printf("%d ",i-1);
+            break;
+        }
+    
+    for(int i=1;i<=7;i++)
+        if(tr[1][i].X>0) printf("%d ",tr[1][i].X);
+        else break;
+    return 0;
+}

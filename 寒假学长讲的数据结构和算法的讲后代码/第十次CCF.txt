@@ -1,0 +1,251 @@
+第一题：
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=1010;
+int a[N],n,k;
+
+int main(void){
+    scanf("%d%d",&n,&k);
+    
+    for(int i=1;i<=n;i++)
+        scanf("%d",&a[i]);
+    
+    int res=0;
+    for(int i=1;i<=n;i++){
+        res++;
+        int j=i,ans=0;
+        while(j<=n && ans<k) ans+=a[j++];
+        i=j-1;
+    }
+    
+    cout<<res<<endl;
+    return 0;
+}
+
+第二题：
+//双链表
+
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=1010;
+int e[N],ne[N],pre[N],idx=2;
+int n,m;
+void add(int a){
+    e[idx]=a;
+    ne[pre[1]]=idx,pre[idx]=pre[1];
+    ne[idx]=1,pre[1]=idx;
+    idx++;
+}
+//函数重载
+
+void add(int p,int r){
+    ne[pre[p]]=ne[p];
+    pre[ne[p]]=pre[p];
+    
+    pre[ne[r]]=p,ne[p]=ne[r];
+    ne[r]=p,pre[p]=r;
+}
+
+int main(void){
+    ne[0]=1,pre[1]=0;
+    scanf("%d%d",&n,&m);
+    for(int i=1;i<=n;i++)   add(i);
+    
+    int p,q;
+    while(m--){
+        scanf("%d%d",&p,&q);
+        for(int i=ne[0];i!=1;i=ne[i])
+            if(e[i]==p) {
+                p=i;
+                break;
+            }
+        
+        int r=p;
+        if(q>0)
+            for(int i=0;i<q;i++)
+                r=ne[r];
+        else 
+            for(int i=0;i<=-q;i++)
+                r=pre[r];
+        
+        add(p,r);//把p插到r之后
+    }
+    
+    for(int i=ne[0];i!=1;i=ne[i])
+        cout<<e[i]<<" ";
+    cout<<endl;
+    return 0;
+}
+
+第三题：
+#include<iostream>
+#include<cstring>
+#include<string>
+#include<sstream>
+
+using namespace std;
+int g(string s,string &p);
+int h(string s,string &p);
+
+
+string str(string &s){
+    int sta=0;
+    while(s[sta]==' ') sta++;
+    s=s.substr(sta);
+    return s;
+}
+
+
+int g(string s,string &p){
+    p+="<em>";
+    int i;
+    for(i=0;i<s.size();i++)
+        if(s[i]=='_'){
+            i++;
+            break;
+        }
+        else if(s[i]=='[')  i+=h(s.substr(i+1),p);
+        else p+=s[i];
+    p+="</em>";
+    return i;
+}
+
+int h(string s,string &p){
+    string t="",q="";
+    int i;
+    //处理完[]
+    for(i=0;i<s.size();i++)
+        if(s[i]==']'){
+            i++;
+            break;
+        }
+        else if(s[i]=='_') i+=g(s.substr(i+1),t);
+        else t+=s[i];
+    
+    i++;
+    //处理()
+    for(;i<s.size();i++)
+        if(s[i]==')'){
+            i++;
+            break;
+        }
+        else if(s[i]=='_')  i+=g(s.substr(i+1),q);
+        else q+=s[i];
+    
+    p+="<a href=";
+    p+='"'+q+'"'+">"+t+"</a>";
+    
+    return i;
+}
+
+void f(string s){
+    string p="";
+    
+    for(int i=0;i<s.size();i++)
+        if(s[i]=='_')   i+=g(s.substr(i+1),p);
+        else if(s[i]=='[') i+=h(s.substr(i+1),p);
+        else p+=s[i];
+    
+    cout<<p;
+}
+
+int main(void){
+    string s,t;
+    while(getline(cin,s)){
+        if(s[0]=='#'){
+            stringstream ss(s);
+            ss>>t;
+            printf("<h%d>",t.size());
+            getline(ss,s);
+            f(str(s));
+            printf("</h%d>",t.size());
+            cout<<endl;
+        }
+        else if(s[0]=='*'){
+            cout<<"<ul>"<<endl;
+            stringstream ss(s);
+            ss>>s;
+            getline(ss,s);
+            cout<<"<li>";
+            f(str(s));
+            cout<<"</li>"<<endl;
+            while(getline(cin,s) && s!=""){
+                cout<<"<li>";
+                stringstream ss(s);
+                ss>>s;
+                getline(ss,s);
+                f(str(s));
+                cout<<"</li>"<<endl;
+            }
+            cout<<"</ul>"<<endl;
+        }
+        else if(s!=""){
+            cout<<"<p>";
+            f(s);
+            while(getline(cin,s) && s!=""){
+                cout<<endl;
+                f(s);
+            }
+            cout<<"</p>"<<endl;
+        }
+    }
+    return 0;
+}
+
+第四题：
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=100010,M=400010;
+int h[N],w[M],e[M],ne[M],idx;
+int n,m;
+int q[N],d[N];
+bool st[N];
+
+void add(int a,int b,int c){
+    e[idx]=b,w[idx]=c,ne[idx]=h[a],h[a]=idx++;
+}
+
+void spfa(){
+    memset(d,0x3f,sizeof d);
+    int hh=0,tt=0;
+    d[1]=0;
+    q[tt++]=1;
+    while(hh!=tt){
+        int t=q[hh++];
+        if(hh==N) hh=0;
+        st[t]=0;
+        
+        for(int i=h[t];~i;i=ne[i]){
+            int j=e[i];
+            if(d[j]>max(d[t],w[i])){
+                d[j]=max(d[t],w[i]);
+                if(!st[j]){
+                    st[j]=1;
+                    q[tt++]=j;
+                    if(tt==N) tt=0;
+                }
+            }
+        }
+    }
+}
+
+int main(void){
+    memset(h,-1,sizeof h);
+    scanf("%d%d",&n,&m);
+    int a,b,c;
+    while(m--){
+        scanf("%d%d%d",&a,&b,&c);
+        add(a,b,c),add(b,a,c);
+    }
+    
+    
+    spfa();
+    cout<<d[n]<<endl;
+    return 0;
+}

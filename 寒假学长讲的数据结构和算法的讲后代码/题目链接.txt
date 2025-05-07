@@ -1,0 +1,8 @@
+并查集模板：http://ybt.ssoier.cn:8088/problem_show.php?pid=1346
+维护每个集合中元素的个数：http://ybt.ssoier.cn:8088/problem_show.php?pid=1389
+练习：http://ybt.ssoier.cn:8088/problem_show.php?pid=1347
+并查集拓展:http://ybt.ssoier.cn:8088/problem_show.php?pid=1390
+
+flood fill:
+第一题：http://ybt.ssoier.cn:8088/problem_show.php?pid=1249
+求解连通块个数：https://ac.nowcoder.com/acm/contest/41954/E

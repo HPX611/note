@@ -1,0 +1,53 @@
+//dijstra算法 
+#include<iostream>
+#include<cstring>
+using namespace std;
+const int N=10000;
+struct n{
+	int to;//连的对象 
+	int dis;//距离 
+	int next;//兄弟是谁 
+}e[N*2];
+int h[N];//去寻找cnt 
+int cnt;//就是下标去寻找结构体 
+bool st[N];//看是否到访 
+int ans[N];//结果 
+void add(int x,int y,int z){
+	cnt++;//后移使结构体不重复 
+	e[cnt].to=y;
+	e[cnt].next=h[x];//若x没有变化，存x所连的上一个节点所对的cnt 
+	e[cnt].dis=z;
+	h[x]=cnt;//改变x所对应的cnt 
+}
+
+int main(void){
+	int n,m,c;
+	memset(ans,0x3f,sizeof(ans));//初始化 
+	cin>>n>>m>>c;
+	int x,y,z;
+	for(int i=0;i<m;i++){
+		cin>>x>>y>>z;
+		add(x,y,z); //连线 
+	}
+	
+	int cur=c;
+	ans[cur]=0;
+	while(st[cur]==0){//开始遍历直到所有都被遍历 
+		st[cur]=1;//该点被踩 
+		for(int i=h[cur]/*找到开始的cnt*/;i/*直到最后边被找到*/;i=e[i].next/*相邻的边所对的cnt*/){
+			if(!st[e[i].to]&&ans[e[i].to]>ans[cur]+e[i].dis)//判断是否要变 
+				ans[e[i].to]=ans[cur]+e[i].dis;
+		}
+		//改点周围所连的点被改完 
+		int minn=0x3f;
+		//寻找周围点中与该点距离最近的点作为下一次循环的起点 
+		for(int i=1;i<=n;i++){
+			if(!st[i]/*剔除被踩过的点*/&&minn>ans[i]){
+				minn=ans[i];
+				cur=i;
+			}
+		}
+	}
+	for(int i=1;i<=n;i++)	cout<<ans[i]<<" "; 
+	return 0;
+}

@@ -1,0 +1,136 @@
+
+第六次CCF第三题：
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=110;
+char g[N][N];
+int n,m,q;
+bool st[N][N];
+
+const int dx[]={-1,0,+1,0};
+const int dy[]={0,+1,0,-1};
+
+void dfs(int x,int y,char c){
+    st[x][y]=1;
+    g[x][y]=c;
+    
+    for(int i=0;i<4;i++){
+        int a=x+dx[i],b=y+dy[i];
+        if(a<0 || a>=n || b<0 || b>=m) continue;
+        if(st[a][b] || g[a][b]=='-' || g[a][b]=='|' || g[a][b]=='+') continue;
+        dfs(a,b,c);
+    }
+    return ;
+}
+
+int main(void){
+    scanf("%d%d%d",&m,&n,&q);
+    
+    for(int i=0;i<n;i++)
+        for(int j=0;j<m;j++)
+            g[i][j]='.';
+    
+    int op,x1,y1,x2,y2;
+    char s[5];
+    
+    while(q--){
+        scanf("%d",&op);
+        
+        if(!op){
+            scanf("%d%d%d%d",&y1,&x1,&y2,&x2);
+            if(x1==x2){
+                if(y1>y2) swap(y1,y2);
+                for(int i=y1;i<=y2;i++)
+                    if(g[x1][i]=='|' || g[x1][i]=='+') g[x1][i]='+';
+                    else g[x1][i]='-';
+            }
+            else{
+                if(x1>x2) swap(x1,x2);
+                for(int i=x1;i<=x2;i++)
+                    if(g[i][y1]=='-' || g[i][y1]=='+') g[i][y1]='+';
+                    else g[i][y1]='|';
+            }
+        }
+        else{
+            memset(st,0,sizeof st);
+            scanf("%d%d%s",&y1,&x1,s);
+            dfs(x1,y1,*s);
+        }
+    }
+    
+    for(int i=n-1;i>=0;i--)
+        printf("%s\n",g[i]);
+    
+    return 0;
+}
+
+
+
+237. 程序自动分析
+#include<iostream>
+#include<cstring>
+#include<vector>
+#include<algorithm>
+
+using namespace std;
+const int N=200010;
+int p[N];
+vector<int> mem;
+int n;
+struct Node{
+    int a,b,c;
+}tr[N];
+
+int find(int x){
+    if(x!=p[x]) p[x]=find(p[x]);
+    return p[x];
+}
+
+int find_s(int x){
+    return lower_bound(mem.begin(),mem.end(),x)-mem.begin()+1;
+}
+
+int main(void){
+    int T,a,b,c;
+    scanf("%d",&T);
+    
+    while(T--){
+        int cnt=0;
+        mem.clear();
+        
+        scanf("%d",&n);
+        for(int i=0;i<n;i++){
+            scanf("%d%d%d",&a,&b,&c);
+            mem.push_back(a);
+            mem.push_back(b);
+            tr[i]={a,b,c};
+        }
+        
+        sort(mem.begin(),mem.end());
+        mem.erase(unique(mem.begin(),mem.end()),mem.end());
+        
+        for(int i=1;i<=mem.size();i++)   p[i]=i;
+        
+        for(int i=0;i<n;i++){
+            if(tr[i].c){
+                int pa=find(find_s(tr[i].a)),pb=find(find_s(tr[i].b));
+                p[pa]=pb;
+            }
+            else tr[cnt++]=tr[i];
+        }
+        
+        int i;
+        for(i=0;i<cnt;i++){
+            int pa=find(find_s(tr[i].a)),pb=find(find_s(tr[i].b));
+            if(pa==pb){
+                printf("NO\n");
+                break;
+            }
+        }
+        
+        if(i==cnt) printf("YES\n");
+    }
+    return 0;
+}

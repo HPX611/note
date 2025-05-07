@@ -1,0 +1,134 @@
+第一题：
+#include<iostream>
+#include<cstring>
+#include<map>
+using namespace std;
+const int N=10010;
+
+map<int,int> mem;
+int n,x;
+
+int main(void){
+    cin>>n;
+    int res=-1,maxv=-1;
+    while(n--){
+        cin>>x;
+        mem[x]++;
+        if(mem[x]>maxv || (mem[x]==maxv &&  x<res)) maxv=mem[x],res=x;
+    }
+    cout<<res<<endl;
+}
+
+第二题：
+#include<iostream>
+#include<cstring>
+#include<string>
+
+using namespace std;
+
+int main(void){
+    string s;
+    cin>>s;
+    int t=1,i=0,res;
+    while(t<=9){
+        while(s[i]<'0' || s[i]>'9') i++;
+        res=(res+(s[i]-'0')*t)%11;
+        i++,t++;
+    }
+    
+    char ans;
+    if(res==10) ans='X';
+    else ans=res+'0';
+    
+    if(ans==s[s.size()-1]) printf("Right\n");
+    else{
+        s[s.size()-1]=ans;
+        cout<<s<<endl;
+    }
+    return 0;
+}
+
+第三题：
+解法一：暴力
+
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=1010;
+int h[N],n,res;
+
+int main(void){
+    cin>>n;
+    for(int i=1;i<=n;i++)   cin>>h[i];
+    for(int l=1;l<=n;l++){
+        int minv=h[l];
+        for(int r=l;r<=n;r++){
+            minv=min(minv,h[r]);
+            res=max(res,minv*(r-l+1));
+        }
+    }
+    
+    cout<<res<<endl;
+}
+解法二：单调栈
+预备知识：求解序列中左边第一个比自己小的数字的单调栈做法(luoguP5788)
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=100010;
+int stk[N],tt=-1;
+int n;
+
+int main(void){
+    scanf("%d",&n);
+    int x;
+    for(int i=1;i<=n;i++){
+        scanf("%d",&x);
+        while(tt!=-1 && stk[tt]>=x) tt--;
+        if(tt==-1) printf("-1 ");
+        else printf("%d ",stk[tt]);
+        stk[++tt]=x;
+    }
+    
+    return 0;
+}
+
+本题解法：
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=100010;
+typedef long long LL;
+int h[N],L[N];
+LL res;
+int n;
+int stk[N],tt=-1;
+
+int main(void){
+    while(scanf("%d",&n),n){
+        tt=-1,res=0;
+        h[0]=h[n+1]=-1;
+        for(int i=1;i<=n;i++)   scanf("%d",&h[i]);
+        
+        stk[++tt]=0;
+        for(int i=1;i<=n;i++){
+            while(tt!=-1 && h[i]<=h[stk[tt]]) tt--;
+            L[i]=stk[tt];
+            stk[++tt]=i;
+        }//求解出了左边第一个比自己小的数的下标
+        
+        tt=-1;
+        stk[++tt]=n+1;
+        for(int i=n;i;i--){
+            while(tt!=-1 && h[i]<=h[stk[tt]]) tt--;
+            res=max(res,(stk[tt]-L[i]-1)*(LL)h[i]);
+            stk[++tt]=i;
+        }
+        
+        printf("%lld\n",res);
+    }
+    return 0;
+}

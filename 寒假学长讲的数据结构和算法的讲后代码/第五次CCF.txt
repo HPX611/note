@@ -1,0 +1,155 @@
+第一题：
+
+#include<iostream>
+#include<cstring>
+#include<algorithm>
+#include<vector>
+
+using namespace std;
+const int N=1010;
+int n,x;
+vector<int> mem;
+
+int main(void){
+    scanf("%d",&n);
+    while(n--){
+        scanf("%d",&x);
+        mem.push_back(x);
+    }
+    mem.erase(unique(mem.begin(),mem.end()),mem.end());
+    
+    cout<<mem.size()<<endl;
+    return 0;
+}
+
+离散化技巧：（例题电影103）
+// cnt[i]//表示编号为i的语言有多少位科学家懂
+
+#include<iostream>
+#include<cstring>
+#include<vector>
+#include<algorithm>
+
+#define x first
+#define y second
+
+using namespace std;
+typedef pair<int,int> PII;
+const int N=200010;
+int a[N];
+PII b[N];                       ->f(i)    
+int cnt[N*3];// cnt[i]//表示编号为i的语言有多少位科学家懂
+int n,m;
+vector<int> mem;//离散化数组,做了一个一一映射
+
+int find(int x){
+    return lower_bound(mem.begin(),mem.end(),x)-mem.begin();
+}
+
+int main(void){
+    scanf("%d",&n);
+    for(int i=0;i<n;i++){
+        scanf("%d",&a[i]);
+        mem.push_back(a[i]);
+    }
+    
+    scanf("%d",&m);
+    for(int i=0;i<m;i++){
+        scanf("%d",&b[i].x);
+        mem.push_back(b[i].x);
+    }
+    
+    for(int i=0;i<m;i++){
+        scanf("%d",&b[i].y);
+        mem.push_back(b[i].y);
+    }
+    
+    sort(mem.begin(),mem.end());//排序
+    mem.erase(unique(mem.begin(),mem.end()),mem.end());//去重
+    
+    for(int i=0;i<n;i++)    cnt[find(a[i])]++;
+    
+    int res=0;
+    for(int i=1;i<m;i++){
+        int u=find(b[i].x),v=find(b[i].y),w=find(b[res].x),p=find(b[res].y);
+        if(cnt[u]>cnt[w] ) res=i;
+        else if(cnt[u]==cnt[w] && cnt[v]>cnt[p])
+            res=i;
+    }
+    
+    cout<<res+1<<endl;
+}
+
+第二题：
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+int y,d;
+const int mo[]={0,31,28,31,30,31,30,31,31,30,31,30,31};
+
+int check(int y){
+    return (y%400==0)||(y%4==0 && y%100);
+}
+
+int main(void){
+    cin>>y>>d;
+    int res=0,m=1;
+    while(res+mo[m]+(check(y) && m==2)<d) {
+        res+=mo[m]+(check(y) && m==2);
+        m++;
+    }
+    printf("%d\n%d\n",m,d-res);
+    return 0;
+}
+
+
+第三题：
+
+#include<iostream>
+#include<cstring>
+#include<string>
+#include<sstream>
+#include<map>
+using namespace std;
+const int N=110;
+string res[N];
+map<string,string> mem;
+int m,n;
+
+int main(void){
+    string s,t;
+    cin>>m>>n;
+    getline(cin,s);
+    
+    for(int i=0;i<m;i++)    getline(cin,res[i]);
+    
+    while(n--){
+        getline(cin,s);
+        stringstream ss(s);
+        ss>>s;
+        getline(ss,t);
+        mem[s]=t.substr(2,t.size()-3); 
+    }
+    
+    for(int i=0;i<m;i++){
+        for(int j=0;j<res[i].size();j++){
+            if(j+2<res[i].size() && res[i].substr(j,3)=="{{ "){
+                int start=j;
+                j+=3;
+                s="";
+                while(j+2<res[i].size() && res[i].substr(j,3)!=" }}")    s+=res[i][j++];
+                j+=3;
+                t="";
+                if(j<res[i].size())   t=res[i].substr(j);
+                if(mem.count(s))  res[i]=res[i].substr(0,start)+mem[s];
+                else res[i]=res[i].substr(0,start);
+                j=res[i].size()-1;
+                res[i]+=t;
+            }
+        }
+        cout<<res[i]<<endl;
+    }
+    
+    return 0;
+}

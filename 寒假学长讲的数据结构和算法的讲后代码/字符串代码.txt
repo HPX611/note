@@ -1,0 +1,83 @@
+Trie代码：
+#include<iostream>
+#include<cstring>
+
+//Éè×Ö·û´®¼¯ºÏÖÐÖ»ÓÐÐ¡Ð´×ÖÄ¸ 
+using namespace std;
+const int N=100010;
+int tr[N][26],cnt[N],idx=1;
+int n;
+
+void insert(char s[]){
+	int p=0;
+	for(int i=0;s[i];i++){
+		int t=s[i]-'a';
+		if(!tr[p][t])  tr[p][t]=idx++;
+		p=tr[p][t];
+	}
+	cnt[p]++;
+	return ;
+}
+
+bool query(char s[]){
+	int p=0;
+	for(int i=0;s[i];i++){
+		int t=s[i]-'a';
+		if(!tr[p][t]) return 0;
+		p=tr[p][t];
+	}
+	return cnt[p]!=0;
+}
+
+int main(void){
+	scanf("%d",&n);
+	char s[N];
+	
+	while(n--){
+		scanf("%s",s);
+		insert(s);
+	}
+	scanf("%d",&n);
+	
+	while(n--){
+		scanf("%s",s);
+		if(query(s)) printf("YES\n");
+		else printf("NO\n");
+	}
+	
+	return 0;
+}
+
+
+KMP代码：
+//从s中找出p串出现的所有位置
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=1000010;
+char s[N],p[N];
+int n,m;
+int ne[N];
+
+int main(void){
+    scanf("%d%s%d%s",&n,p+1,&m,s+1);//n是p的长度，m是s的长度
+    
+    //求解ne数组
+    for(int i=2,j=0;i<=n;i++){
+        while(j && p[j+1]!=p[i]) j=ne[j];
+        if(p[j+1]==p[i]) j++;
+        ne[i]=j;
+    }
+    
+    //完成匹配
+    for(int i=1,j=0;i<=m;i++){
+        while(j && p[j+1]!=s[i]) j=ne[j];
+        if(p[j+1]==s[i]) j++;
+        if(j==n){
+            printf("%d ",i-j);
+        }
+    }
+    
+    return 0;
+}

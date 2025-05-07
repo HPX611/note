@@ -1,0 +1,127 @@
+第二题：
+#include<iostream>
+#include<cstring>
+
+using namespace std;
+const int N=20;
+int g[N][N],f[N][N];
+int n;
+
+int main(void){
+    for(int i=1;i<=15;i++)
+        for(int j=1;j<=10;j++)
+            scanf("%d",&g[i][j]);
+    for(int i=1;i<=10;i++)  g[16][i]=1;
+    
+    for(int i=1;i<=4;i++)
+        for(int j=1;j<=4;j++)
+            scanf("%d",&f[i][j]);
+    
+    scanf("%d",&n);
+    
+    //枚举一下最上面的行
+    for(int i=1;i<=15;i++){
+        int flag=0;
+        for(int j=1;j<=4;j++){
+            for(int k=n;k<n+4;k++)
+                if(g[i+j][k] & f[j][k-n+1]) {
+                    flag=1;
+                    break;
+                }
+            if(flag) break;
+        }
+        
+        if(flag){
+            for(int j=1;j<=4;j++)
+                for(int k=n;k<n+4;k++)
+                    g[i+j-1][k]|=f[j][k-n+1];
+            break;
+        }
+    }
+    
+    for(int i=1;i<=15;i++,printf("\n"))
+        for(int j=1;j<=10;j++)
+            printf("%d ",g[i][j]);
+    return 0;
+}
+
+第三题：
+#include<iostream>
+#include<cstring>
+#include<map>
+
+using namespace std;
+const int N=100010;
+struct Node{
+    string s;
+    map<string,int> mem;
+    int p;
+}tr[N];
+int idx=1;
+int n;
+string s;
+int ans[N];
+
+int build(string s,int p){
+    tr[idx].s=s;
+    tr[idx].p=p;
+    return idx++;
+}
+
+bool dfs(int u,int tar,int cnt){
+    ans[cnt]=u;
+    
+    if(u==tar){
+        if(!cnt) cout<<"/";
+        else 
+            for(int i=1;i<=cnt;i++)
+                cout<<"/"<<tr[ans[i]].s;
+        cout<<endl;
+        return 1;
+    }
+    
+    for(auto t:tr[u].mem)
+        if(dfs(t.second,tar,cnt+1)) return 1;
+    return 0;
+}
+
+int main(void){
+    cin>>n>>s;
+    
+    int p=0,r;
+    for(int i=0;i<s.size();){
+        while(s[i]=='/') i++;
+        string t="";
+        while(i<s.size() && s[i]!='/') t+=s[i++];
+        tr[p].mem[t]=build(t,p);
+        p=tr[p].mem[t];
+    }
+    r=p;
+    
+    getline(cin,s);
+    
+    while(n--){
+        getline(cin,s);
+        if(s=="")   dfs(0,r,0);
+        else{
+            if(s[0]=='/')   p=0;
+            else p=r;
+            
+            for(int i=0;i<s.size();){
+                while(i<s.size() && s[i]=='/') i++;
+                if(i==s.size()) break;
+                string t="";
+                while(i<s.size() && s[i]!='/') t+=s[i++];
+                if(t==".") continue;
+                else if(t=="..") p=tr[p].p;
+                else{
+                    if(!tr[p].mem.count(t)) tr[p].mem[t]=build(t,p);
+                    p=tr[p].mem[t];
+                }
+            }
+            dfs(0,p,0);
+        }
+    }
+    
+    return 0;
+}
